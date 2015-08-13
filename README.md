@@ -6,3 +6,5 @@
 1：work-imagefilter-拍照，取图库图片然后滤镜 
 
 2：AndroidParseXML xml parser --参考http://blog.csdn.net/liuhe688/article/details/6415593
+
+3：work_image--对网络压缩包下载解压，使用volley框架加载
