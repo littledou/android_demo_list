@@ -1,0 +1,10 @@
+copy from http://blog.csdn.net/liuhe688/article/details/6733407
+Don't call me, I'll call you.
+1:启动Activity：系统线调用OnCreate方法，然后调用OnStart方法，最后调用OnResume，Activity进入运行状态
+2：当前Activity被其他Activity覆盖其上或被锁屏：系统调用OnPause方法，暂停Activity的执行
+3：当前Activity由被覆盖状态回到前台或解锁屏：系统调用OnResume，再次进入运行状态
+4：当前Activity转到新的Activity或按Home键回到主屏，自身退居后台：系统会先调用onPause，然后调用onStop进入停滞状态
+5：用户后退到此Activity：系统先调用onRestart->onStart->onResume，再次进入运行状态
+6：当前处于被覆盖状态或者后台不可见，即第二步，第四步，系统内存不足，杀死当前Activity，而用户退回到当前Activity:再次调用onCreate->onStart->onResume,进入运行状态
+7：用户退出当前Activity：onPause->onStop->onDestory结束当前Activity
+
