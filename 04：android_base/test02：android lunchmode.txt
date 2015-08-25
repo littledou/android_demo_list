@@ -1,1 +1,13 @@
 copy from http://blog.csdn.net/liuhe688/article/details/6754323
+
+lunchmode 1 :standard
+	默认的启动方式，不用在配置文件中配置，不管有没有已存在的实例，都会生成一个新的实例
+
+lunchmode 2 :singleTop
+	启动时在栈结构中寻找是否有当前实例位与栈顶，如果有则不再重新生成，直接使用，如果栈顶不是当前实例，则重新生成一个实例
+
+lunchmode 3 :singleTask
+	启动时检查当前栈内是否有当前实例，若有将实例前的所有activity强迫出栈，置自己于栈顶
+
+lunchmode 4 : singleInstance
+	比较特殊，它会启用一个新的栈结构，并将Acitvity放置于这个新的栈结构中，并保证不再有其他Activity实例进入
