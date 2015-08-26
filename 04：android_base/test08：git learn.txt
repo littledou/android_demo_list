@@ -1,0 +1,316 @@
+廖雪峰的官方网站:
+	www.liaoxuefeng.com
+
+Git教程总结：
+---------------------------------------------------------------------------------------------------------
+git-----|
+	|----安装git----|
+	|		|--Ubuntu--|
+	|		|	安装git:
+	|		|		$ sudo apt-get install git
+	|		|	配置git:
+	|		|		$ git config --global user.name "Your Name"		
+	|		|		$ git config --global user.email "email@example.com"
+	|
+	
+	|--创建版本库---|
+	|		|--创建本地git工作目录--|
+	|		|			$ mkdir git
+        |		|			$ cd git
+        |		|			$ git init
+        |		|
+        |		|--第一次提交到本地git库--|
+        |		|			$ vim liuxu0315.txt
+        |		|			$ git add liuxu0315.txt
+	|		|			$ git commit -m "add liuxu0315.txt"
+	|	
+        |
+        |--时光机穿梭---|
+	|		|-------|
+	|		|	查看当前状态：
+	|		|		$ git status	
+        |		|	查看difference:
+	|		|		$ git diff
+        |		|
+        |		|--版本退回--|
+        |		|-------查看提交历史记录：
+	|		|		$ git log
+	|		|		$ git log --pretty=oneline
+        |		|-------退回上一个版本：
+	|		|		$ git reset --hard HEAD^
+	|		|	退回上上一个版本：
+	|		|		$ git reset --hard HEAD^^
+        |		|	退回往上100个版本：
+	|		|		$ git reset --hard HEAD~100
+	|		|-------从上一版本回到当前版本：
+	|		|		查看历史命令：
+	|		|			$ git relog	
+	|		|			(得到当前版本commid id:3628164)
+	|		|		返回到当前版本：
+	|		|			$ git reset --hard 3628164		
+        |		|
+	|		|--撤销修改--|
+	|		|-------修改文件：
+	|		|		$ vim liuxu0315.txt
+	|		|		(噢，改错了，要返回修改前)
+	|		|	撤销修改：
+	|		|		$ git checkout -- liuxu0315.txt
+        |		|-------再次修改：
+	|		|		$ vim liuxu0315.txt
+	|		|		$ git add liuxu0315.txt
+	|		|		(完蛋了，又修改错了）
+	|		|	取消此次add：
+	|		|		$ git reset HEAD liuxu0315.txt
+	|		|	撤销修改：
+	|		|		$ git checkout -- liuxu0315.txt
+        |		|
+	|		|--删除文件--|
+	|		|	$ rm liuxu0315.txt
+	|		|	$ git rm liuxu0315.txt
+	|		|	$ git commit -m "rm liuxu0315.txt"
+	|		
+	|		
+        |---远程仓库----|
+        |		|--创建设置SSH Key--|
+	|		|	1.创建SSH Key:
+	|		|		$ ssh-keygen -t rsa -C "youremail@example.com"
+	|		|	2.将~/.ssh/id_rsa.pub复制到github的"个人设置-->SSH Keys"处。 	
+        |		|
+        |		|--添加远程库--|
+	|		|	1.在github中先添加好一个仓库。
+	|		|	(得到一个如：git@github.com:liuxu0315/helloworld.git 这样地址)
+	|		|	(liuxu0315则是你的github ID）
+	|		|	2.在本地仓库下运行：
+	|		|		$ git remote add origin git@github.com:liuxu0315/helloworld.git
+	|		|	此时可以推送到远程github仓库了：
+	|		|		$ git push -u origin master
+	|		|		（参数 -u 是将本地master分支和远程master分支关联起来）
+	|		|
+        |		|--克隆远程仓库--|
+	|		|	$ git clone git@github.com:michaelliao/learngit.git
+	|		
+        |
+        |---远程分支----|
+	|		|--创建与合并分支--|
+	|		|-------创建并跳转到dev分支:
+	|		|		$ git checkout -b dev
+	|		|		（git checkout为跳转到分支，-b为新建分支）
+	|		|-------创建dev分支：
+	|		|		$ git branch dev
+	|		|	跳转到dev分支：
+	|		|		$ git checkout dev
+	|		|-------查看分支：
+	|		|		$ git branch
+	|		|
+        |		|-------然后在dev分支上工作：
+	|		|		$ vim dev.txt
+	|		|		$ git add dev.txt
+        |		|		$ git commit -m "add dev.txt"
+	|		|-------回到master合并dev分支：
+	|		|		$ git checkout master
+	|		|		$ git merge dev
+        |		|-------删除dev分支：
+	|		|		$ git branch -d dev
+        |		|
+	|		|--解决冲突--|
+	|		|	（当在dev和master同时修改dev.txt文件后，）
+	|		|	（在master中合并dev分支是会冲突）
+	|		|	（此时需要编辑一下dev.txt解决掉冲突，）
+	|		|	（然后再add , commit提交）
+	|		|
+	|		|--工作区暂存--|
+	|		|	（用于：需要跳转到其他分支，）
+	|		|	（	又不想commit当前分支，）
+	|		|	（	也不想放弃当前修改时）
+        |		|
+	|		|-------保存当前工作现场：
+	|		|		$ git stash
+        |		|	（跳转到其他分支工作后再回来此分支）
+	|		|-------恢复工作现场：
+	|		|		1.查看以保存的stash内容：
+	|		|			$ git stash list
+	|		|			(可以看到0个或多个stash@{n},n=1,2,3,4...)		
+        |		|		2.恢复工作现场：
+        |		|			$ git stash apply
+	|		|			(或者）
+	|		|			$ git stash apply stash@{0}
+        |		|		3.删除stash内容：
+        |		|			$ git stash drop
+        |		|---------------直接恢复并删除stash内容：
+	|		|			$ git stash pop
+        |
+        |
+        |---标签管理----|
+        |		|--创建标签--|
+	|		|-------快速创建标签：（例：$ git tag <name>）
+        |		|		$ git tag v1.0
+	|		|	查看标签：
+	|		|		$ git tag 
+	|		|	给以前的commit id为6224937打标签：
+        |		|		$ git tag v0.9 6224937
+        |		|	查看标签详细信息：
+        |		|		$ git show v0.9
+        |		|-------创建带说明的标签（commit为3628164）：
+	|		|		$ git tag -a v0.1 -m "version 1.0" 3628164
+        |		|	创建带GPG密钥的标签（确定本地已经配置和GPG KEY）：
+	|		|		$ git tag -s v0.2 -m "signed version 0.2 released" fec145a
+	|		|
+        |		|--操作标签--|
+        |		|-------删除本地某个标签：
+	|		|		$ git tag -d v0.1
+	|		|	推送某个标签到远程仓库：
+	|		|		$ git push origin v1.0
+        |		|	一次全部推送未推送的本地标签：
+        |		|		$ git push origin --tags
+        |		|-------删除远程仓库标签：
+	|		|		$ git tag -d v0.9
+        |		|		$ git push origin :refs/tags/v0.9
+        |
+        |
+        |---自定义Git---|
+        |		|--忽略特殊文件--|
+	|		|	1.将忽略的文件写入.gitignore中
+        |		|		$ vim .gitignore
+        |		|		（如：）	
+        |		|		（dev.txt）
+        |		|		（*.class）
+        |		|		（temp/）
+	|		|	2.提交.gitignore到git仓库
+        |		|		$ git add .gitignore
+        |		|		$ git commit -m "add .gitigonre"
+        |		|
+        |		|--配置别名--|
+	|		|	$ git config --global alias.st status
+        |		|	$ git st
+        |		|	$ git config --global alias.co checkout
+	|		|	$ git config --global alias.ci commit
+	|		|	$ git config --global alias.br branch
+	|		|	$ git config --global alias.unstage 'reset HEAD'
+	|		|	$ git config --global alias.last 'log -l'
+	|		|	$ git config --llobal alias.lg "log --color --graph 
+	|		|		--pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset
+	|		|		%s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+	|		|	$ git lg
+	|		|
+	|		|	(以上配置放在 .git/config 中，）
+	|		|	（个人配置文件在 ~/.gitconfig 中）	
+
+
+# git_use
+创建版本库--
+$ mkdir learngit
+$ cd learngit
+$ pwd
+/Users/michael/learngit
+
+
+  git init--创建git仓库
+
+  git add readme.txt--用命令git add告诉Git，把文件添加到仓库：
+  
+  git commit -m "wrote a readme file"--用命令git commit告诉Git，把文件提交到仓库
+
+  git status--当前版本库状态.git status命令可以让我们时刻掌握仓库当前的状态
+  
+  git diff readme.txt--顾名思义就是查看difference，显示的格式正是Unix通用的diff格式
+  
+  git log--查看log日志，
+  
+  git log --pretty=oneline--日志转成一行，比较醒目
+  
+  git reset --hard HEAD^--回退一个版本
+  
+  git reset --hard 3628164--回退到版本3628164
+  
+  cat readme.txt--看看readme.txt的内容
+  
+  git reflog--Git提供了一个命令git reflog用来记录你的每一次命令
+  
+  
+  第一步是用git add把文件添加进去，实际上就是把文件修改添加到暂存区；
+
+  第二步是用git commit提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+  
+  git checkout -- readme.txt--把readme.txt文件在工作区的修改全部撤销，这里有两种情况：
+
+一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+
+一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+
+总之，就是让这个文件回到最近一次git commit或git add时的状态
+
+  git reset HEAD readme.txt--git reset命令既可以回退版本，也可以把暂存区的修改回退到工作区
+  
+  要关联一个远程库，使用命令git remote add origin git@server-name:path/repo-name.git；
+  
+  关联后，使用命令git push -u origin master第一次推送master分支的所有内容；此后，每次本地提交后，
+  只要有必要，就可以使用命令git push origin master推送最新修改；
+  
+  git clone git@github.com:littledou/git_use.git--克隆版本库
+
+  git branch --查看分支
+
+  git branch dev --创建分支dev
+
+  git checkout dev--切换到分支dev
+
+  git checkout -b dev--创建dev分支并切换到dev
+
+  git merge dev --合并dev分支到当前分支
+
+  git branch -d dev-- 删除分支dev
+
+
+#  解决冲突
+
+   分支dev修改了README.md,切换到主分支也去修改README.md，这样冲突无法直接merge，先 git merge dev,然后查看文件详情中出现的《《《HEAD，调整修改之后在master上提交
+
+   git merge --no-ff -m "merge with no-ff" dev--强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息
+
+# Bug解决
+
+  当前在dev分支需要去master解决1bug
+
+  git stash 把当前工作现场“储藏”起来，等以后恢复现场后继续工作：切到master chackout一个issue分支，解决bug合并到master删除issue切到dev
+
+  git stash list--查看当前保存的工作区
+
+  git stash apply--恢复保存的工作区
+
+  git stash drop-- 删除stash
+
+  git stash pop--恢复并删除
+
+  
+#强制删除某未合并的功能分支
+
+  git branch -D feature
+
+# 多人协作
+
+  git remote--查看远程库的信息
+
+  git remote -v --查看更详细的信息
+
+
+#标签管理
+
+  git tag v1.0--创建v1.0表签
+
+  git tag --查看标签
+
+  git tag v1.0 6224234--对某次提交打标签
+
+  git show v1.0--标签信息
+
+  git tag -d v1.0--删除标签
+
+  git push origin --tags--将全部未提交的标签提交到远程
+
+  已提交的标签删除
+
+  git tag -d v1.0->git push origin :refs/tags/v1.0
+
+
+  
+ 

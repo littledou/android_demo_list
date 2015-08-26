@@ -1,139 +1,141 @@
-1：将数据存储到文件中
-public void save(String data,String filename){//将指定数据存入指定文件中
-	FileOutputStream out = null;
-	BufferedWriter writer = null;
-	try{
-		out = context.openFileOutput(filename , Context.MODE_PRIVATE);
-		//默认存储到 /data/data/<package name>/files/目录下，MODE_PRIVATE指同样的文件名字时，写入的内容覆盖原文件内容，
-		//MODE_APPEND表示如果存在该文件则追加内容，不存在则创建
-		writer = new BufferedWriter(new OutpusStreamWriter(out));
-		writer.write(data);
-	}catch(IOException e){
-		e.printStackTrace();
-	}finally{
+
+文件存储************************************
+	将数据存储到文件中
+	public void save(String data,String filename){//将指定数据存入指定文件中
+		FileOutputStream out = null;
+		BufferedWriter writer = null;
 		try{
-			if(writer!=null){
-				writer.close();
-			}
+			out = context.openFileOutput(filename , Context.MODE_PRIVATE);
+			//默认存储到 /data/data/<package name>/files/目录下，MODE_PRIVATE指同样的文件名字时，写入的内容覆盖原文件内容，
+			//MODE_APPEND表示如果存在该文件则追加内容，不存在则创建
+			writer = new BufferedWriter(new OutpusStreamWriter(out));
+			writer.write(data);
 		}catch(IOException e){
 			e.printStackTrace();
+		}finally{
+			try{
+				if(writer!=null){
+					writer.close();
+				}
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 		}
 	}
-}
-2:从文件中读取数据
-public String load(String filename){//从指定文件名中读取数据
-	FileInputStream in = null;
-	BufferedReader reader = null;
-	StringBuilder content = new StringBuilder();
-	try{
-		in = context.openFileInput(filename);//文件目录/data/data/<package name>/files/
-		reader = new BufferedReader(new InputStreamReader(in));
-		String line = "";
-		while((line = reader.readLine()) != null){
-			content.append(line);
-		}
-
-	}catch(IOException e){
-		e.printStackTrace();
-	}finally{
+	从文件中读取数据
+	public String load(String filename){//从指定文件名中读取数据
+		FileInputStream in = null;
+		BufferedReader reader = null;
+		StringBuilder content = new StringBuilder();
 		try{
-			if(reader!=null){
-				reader.close();
+			in = context.openFileInput(filename);//文件目录/data/data/<package name>/files/
+			reader = new BufferedReader(new InputStreamReader(in));
+			String line = "";
+			while((line = reader.readLine()) != null){
+				content.append(line);
 			}
+
 		}catch(IOException e){
 			e.printStackTrace();
+		}finally{
+			try{
+				if(reader!=null){
+					reader.close();
+				}
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 		}
+		return content.toString();
 	}
-	return content.toString();
-}
 
-3:SharedPreferences 键值对方式存储
-//文件存储在/data/data/<>package name>/shared_prefs/
-//存储
-SharedPreferences.Editor editor = context.getSharedPreferences("data" , MODE_PRIVATE).edit();
-editor.putString("name" , "Tom");
-editor.putInt("age" , 28);
-editor.putBoolean("married",true);
-editor.commit();
+2:SharedPreferences 键值对方式存储
+	//文件存储在/data/data/<>package name>/shared_prefs/
+	//存储
+	SharedPreferences.Editor editor = context.getSharedPreferences("data" , MODE_PRIVATE).edit();
+	editor.putString("name" , "Tom");
+	editor.putInt("age" , 28);
+	editor.putBoolean("married",true);
+	editor.commit();
 
-//读取
-SharedPreferences pref = context.getSharedPreferences("data" , MODE_PRIVATE);
-String name = pref.getString("name","");
-int age = pref.getInt("age" , 0);
-boolean married = pref.getBoolean("married", false);
+	//读取
+	SharedPreferences pref = context.getSharedPreferences("data" , MODE_PRIVATE);
+	String name = pref.getString("name","");
+	int age = pref.getInt("age" , 0);
+	boolean married = pref.getBoolean("married", false);
 
-4：SQLite 数据库存储
-//存储区域--/data/data/<package name>/databases/
---4.1；创建数据库
+3：SQLite 数据库存储
+	//存储区域--/data/data/<package name>/databases/
+	--3.1；创建数据库
 
 
-	public class MyDatabaseHelper extends SQLiteOpenHelper{
-		public static final String CREATE_BOOK = "create table Book(id integer primary key autoincrement,"
-			+"autuor text,price real,pages,integer name text)";
-		
-		private Context mContext;
-		public MyDatabaseHelper(Context context,String name,CursorFactory factory,int version){
+		public class MyDatabaseHelper extends SQLiteOpenHelper{
+			public static final String CREATE_BOOK = "create table Book(id integer primary key autoincrement,"
+				+"autuor text,price real,pages,integer name text)";
+			
+			private Context mContext;
+			public MyDatabaseHelper(Context context,String name,CursorFactory factory,int version){
 
-			//name 数据库名字，
-			super(context,name,factory,version);
-			mContext =  context;
+				//name 数据库名字，
+				super(context,name,factory,version);
+				mContext =  context;
+			}
+			public void onCreate(SQLiteDatabase db){
+				db.execSQL(CREATE_BOOK);//create table CREATE_BOOK
+			}
+			public void onUpgrande(SQLiteDatabase db , int oldVersion,int newVersion){
+				// This database is only a cache for online data, so its upgrade policy is
+				// to simply to discard the data and start over
+				// new MyDatabaseHelper(this , "BookStore.db",null,2)//用于版本更新
+				db.execSQL("drop table if exists Book");
+				onCreate(db);
+			}
 		}
-		public void onCreate(SQLiteDatabase db){
-			db.execSQL(CREATE_BOOK);//create table CREATE_BOOK
-		}
-		public void onUpgrande(SQLiteDatabase db , int oldVersion,int newVersion){
-			// This database is only a cache for online data, so its upgrade policy is
-        	// to simply to discard the data and start over
-        	// new MyDatabaseHelper(this , "BookStore.db",null,2)//用于版本更新
-        	db.execSQL("drop table if exists Book");
-        	onCreate(db);
-		}
-	}
-	MyDatabaseHelper mDatabaserHelper = new MyDatabaseHelper(this , "BookStore.db",null,2)
---4.2 添加数据 --insert命令
-	SQLiteDatabase db = mDatabaserHelper.getWritableDatabase();
-	newRowId = db.insert(
-         FeedEntry.TABLE_NAME,//表格名称
-         FeedEntry.COLUMN_NAME_NULLABLE,//指定在 ContentValues 为空的情况下框架可在其中插入 NULL 的列的名称
-         //（如果您将其设置为 "null"， 那么框架将不会在没有值时插入行。）
-         values);//插入的内容
+		MyDatabaseHelper mDatabaserHelper = new MyDatabaseHelper(this , "BookStore.db",null,2)
+	--3.2 添加数据 --insert命令
+		SQLiteDatabase db = mDatabaserHelper.getWritableDatabase();
+		newRowId = db.insert(
+			 FeedEntry.TABLE_NAME,//表格名称
+			 FeedEntry.COLUMN_NAME_NULLABLE,//指定在 ContentValues 为空的情况下框架可在其中插入 NULL 的列的名称
+			 //（如果您将其设置为 "null"， 那么框架将不会在没有值时插入行。）
+			 values);//插入的内容
 
---4.3 从数据库读取信息 query 命令
-	Cursor cursor = db.query(
-    table,  								// The table to query
-    columns,                                // The columns to return
-    selection,                              // The columns for the WHERE clause
-    selectionArgs,                          // The values for the WHERE clause
-    groupBy,                                // don't group the rows
-    having,                                 // don't filter by row groups
-    orderBy                                 // The sort order
-    );
-   boolean has = cursor.moveToFirst();
-   boolean haNext =  cursor.moveToNext();
+	--3.3 从数据库读取信息 query 命令
+		Cursor cursor = db.query(
+		table,  								// The table to query
+		columns,                                // The columns to return
+		selection,                              // The columns for the WHERE clause
+		selectionArgs,                          // The values for the WHERE clause
+		groupBy,                                // don't group the rows
+		having,                                 // don't filter by row groups
+		orderBy                                 // The sort order
+		);
+	   boolean has = cursor.moveToFirst();
+	   boolean haNext =  cursor.moveToNext();
 
---4.3 更新数据库 update命令
+	--3.3 更新数据库 update命令
 
-	SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-	// New value for one column
-	ContentValues values = new ContentValues();
-	values.put(FeedEntry.COLUMN_NAME_TITLE, title);
+		// New value for one column
+		ContentValues values = new ContentValues();
+		values.put(FeedEntry.COLUMN_NAME_TITLE, title);
 
-	// Which row to update, based on the ID
-	String selection = FeedEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-	String[] selectionArgs = { String.valueOf(rowId) };
+		// Which row to update, based on the ID
+		String selection = FeedEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+		String[] selectionArgs = { String.valueOf(rowId) };
 
-	int count = db.update(
-	    FeedReaderDbHelper.FeedEntry.TABLE_NAME,
-	    values,
-	    selection,
-	    selectionArgs);
+		int count = db.update(
+			FeedReaderDbHelper.FeedEntry.TABLE_NAME,
+			values,
+			selection,
+			selectionArgs);
 
---4.3 从数据库删除信息
-	// Define 'where' part of query.
-	String selection = FeedEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-	// Specify arguments in placeholder order.
-	String[] selectionArgs = { String.valueOf(rowId) };
-	// Issue SQL statement.
-	db.delete(table_name, selection, selectionArgs);
+	--3.4 从数据库删除信息
+		// Define 'where' part of query.
+		String selection = FeedEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+		// Specify arguments in placeholder order.
+		String[] selectionArgs = { String.valueOf(rowId) };
+		// Issue SQL statement.
+		db.delete(table_name, selection, selectionArgs);
 	
